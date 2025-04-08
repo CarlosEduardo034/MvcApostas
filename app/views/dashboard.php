@@ -61,6 +61,9 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                 <th>Vencedor</th>
                 <th>Tipo</th>
                 <th>Status</th>
+                <th>Apostas no Lutador 1</th>
+                <th>Apostas no Lutador 2</th>
+                <th>Total Apostado</th>
             </tr>
         </thead>
         <tbody>
@@ -93,6 +96,11 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                     </td>
                     <td>
                         <?= $luta['status'] === 'concluido' ? 'Evento Concluído' : 'Evento Pendente' ?>
+                    </td>
+                    <td>R$ <?= number_format($luta['apostas_lutador1'], 2, ',', '.') ?></td>
+                    <td>R$ <?= number_format($luta['apostas_lutador2'], 2, ',', '.') ?></td>
+                    <td>
+                        R$ <?= number_format($luta['apostas_lutador1'] + $luta['apostas_lutador2'], 2, ',', '.') ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

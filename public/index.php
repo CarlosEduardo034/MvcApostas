@@ -57,6 +57,11 @@ switch ($action) {
         $controller = new LutaController();
         $controller->declararVencedor();
         break;
+    case 'apostar':
+        require_once '../app/controllers/ApostaController.php';
+        $controller = new ApostaController();
+        $controller->apostar();
+        break;
     default:
         echo "Ação inválida.";
 }

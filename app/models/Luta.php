@@ -41,7 +41,6 @@ class Luta {
     
         return $lutas;
     }
-    
     public function excluirLuta($id) {
         $stmt = $this->conn->prepare("DELETE FROM lutas WHERE id = ?");
         $stmt->bind_param("i", $id);
@@ -54,6 +53,15 @@ class Luta {
             WHERE id = ?
         ");
         $stmt->bind_param("si", $vencedor, $id);
+        return $stmt->execute();
+    }
+    public function atualizarTotaisAposta($luta_id, $valor, $escolha) {
+        $campo = $escolha === 'lutador1' ? 'apostas_lutador1' : 'apostas_lutador2';
+    
+        $stmt = $this->conn->prepare("
+            UPDATE lutas SET $campo = $campo + ? WHERE id = ?
+        ");
+        $stmt->bind_param("di", $valor, $luta_id);
         return $stmt->execute();
     }
 }
