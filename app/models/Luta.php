@@ -11,18 +11,23 @@ class Luta {
 
     public function criarLuta($data) {
         $stmt = $this->conn->prepare("
-            INSERT INTO lutas (data_hora, lutador1_nome, lutador1_desc, lutador2_nome, lutador2_desc)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO lutas (
+                data_hora, tipo_luta, lutador1_nome, lutador1_peso,
+                lutador2_nome, lutador2_peso, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
+        $status = 'pendente';
         $stmt->bind_param(
-            "sssss",
+            "sssssss",
             $data['data_hora'],
+            $data['tipo_luta'],
             $data['lutador1_nome'],
-            $data['lutador1_desc'],
+            $data['lutador1_peso'],
             $data['lutador2_nome'],
-            $data['lutador2_desc']
+            $data['lutador2_peso'],
+            $status
         );
-
+    
         return $stmt->execute();
     }
     public function listarLutas() {
@@ -36,13 +41,18 @@ class Luta {
     
         return $lutas;
     }
+    
     public function excluirLuta($id) {
         $stmt = $this->conn->prepare("DELETE FROM lutas WHERE id = ?");
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
     public function atualizarVencedor($id, $vencedor) {
-        $stmt = $this->conn->prepare("UPDATE lutas SET vencedor = ? WHERE id = ?");
+        $stmt = $this->conn->prepare("
+            UPDATE lutas 
+            SET vencedor = ?, status = 'concluido' 
+            WHERE id = ?
+        ");
         $stmt->bind_param("si", $vencedor, $id);
         return $stmt->execute();
     }

@@ -9,7 +9,6 @@ class LutaController {
             exit;
         }
     
-        // Validação da data
         $dataHora = $_POST['data_hora'];
         $agora = date('Y-m-d H:i:s');
     

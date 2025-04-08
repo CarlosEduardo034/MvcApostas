@@ -21,18 +21,28 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
 
 <h3>Cadastrar Nova Luta</h3>
 <form action="/apostas_mvc_completo/public/index.php?action=salvar_luta" method="post">
+    <label>Tipo de Luta:</label><br>
+    <select name="tipo_luta" required>
+        <option value="">Selecione</option>
+        <option value="Boxe">Boxe</option>
+        <option value="MMA">MMA</option>
+        <option value="Jiu-Jitsu">Jiu-Jitsu</option>
+        <option value="Muay Thai">Muay Thai</option>
+        <option value="Karatê">Karatê</option>
+    </select><br><br>
+
     <label>Data e Hora:</label><br>
     <input type="datetime-local" name="data_hora" required min="<?= date('Y-m-d\TH:i') ?>"><br><br>
 
     <label>Lutador 1 - Nome:</label><br>
     <input type="text" name="lutador1_nome" required><br>
-    <label>Lutador 1 - Descrição:</label><br>
-    <textarea name="lutador1_desc"></textarea><br><br>
+    <label>Lutador 1 - Peso (kg):</label><br>
+    <input type="number" name="lutador1_peso" step="0.1" required><br><br>
 
     <label>Lutador 2 - Nome:</label><br>
     <input type="text" name="lutador2_nome" required><br>
-    <label>Lutador 2 - Descrição:</label><br>
-    <textarea name="lutador2_desc"></textarea><br><br>
+    <label>Lutador 2 - Peso (kg):</label><br>
+    <input type="number" name="lutador2_peso" step="0.1" required><br><br>
 
     <button type="submit">Salvar Luta</button>
 </form>
@@ -47,8 +57,10 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                 <th>Descrição 1</th>
                 <th>Lutador 2</th>
                 <th>Descrição 2</th>
-                <th>Ações</th>
+                <th>Modalidade</th>
                 <th>Vencedor</th>
+                <th>Tipo</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -56,9 +68,10 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                 <tr>
                     <td><?= htmlspecialchars($luta['data_hora']) ?></td>
                     <td><?= htmlspecialchars($luta['lutador1_nome']) ?></td>
-                    <td><?= nl2br(htmlspecialchars($luta['lutador1_desc'])) ?></td>
+                    <td><?= htmlspecialchars($luta['lutador1_peso']) ?> kg</td>
                     <td><?= htmlspecialchars($luta['lutador2_nome']) ?></td>
-                    <td><?= nl2br(htmlspecialchars($luta['lutador2_desc'])) ?></td>
+                    <td><?= htmlspecialchars($luta['lutador2_peso']) ?> kg</td>
+                    <td><?= htmlspecialchars($luta['tipo_luta']) ?></td>
                     <td>
                         <a href="/apostas_mvc_completo/public/index.php?action=excluir_luta&id=<?= $luta['id'] ?>" 
                         onclick="return confirm('Tem certeza que deseja excluir esta luta?');"
@@ -77,6 +90,9 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                                 <button type="submit">Salvar</button>
                             </form>
                         <?php endif; ?>
+                    </td>
+                    <td>
+                        <?= $luta['status'] === 'concluido' ? 'Evento Concluído' : 'Evento Pendente' ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
