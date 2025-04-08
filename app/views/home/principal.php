@@ -26,6 +26,14 @@ $lutas = $lutaModel->listarLutas();
             <?= htmlspecialchars($luta['lutador1_nome']) ?> (<?= $luta['lutador1_peso'] ?> kg) x 
             <?= htmlspecialchars($luta['lutador2_nome']) ?> (<?= $luta['lutador2_peso'] ?> kg)<br><br>
 
+            <?php
+                $odds = $lutaModel->calcularOdds($luta);
+            ?>
+
+            <p><strong>Odds:</strong><br>
+            <?= $luta['lutador1_nome'] ?>: <?= number_format($odds['lutador1'], 2, ',', '.') ?>x <br>
+            <?= $luta['lutador2_nome'] ?>: <?= number_format($odds['lutador2'], 2, ',', '.') ?>x</p>
+
             <form action="/apostas_mvc_completo/public/index.php?action=apostar" method="post">
                 <input type="hidden" name="luta_id" value="<?= $luta['id'] ?>">
                 <label>Escolha seu lutador:</label><br>
@@ -34,7 +42,6 @@ $lutas = $lutaModel->listarLutas();
 
                 <label>Valor da Aposta (R$):</label><br>
                 <input type="number" name="valor" min="1" step="0.01" required><br><br>
-
                 <button type="submit">Fazer Aposta</button>
             </form>
         </div>
