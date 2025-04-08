@@ -51,7 +51,7 @@ class User {
         if ($result->num_rows === 1) {
             $usuario = $result->fetch_assoc();
             if (password_verify($senha, $usuario['senha'])) {
-                return $usuario; // contém 'role'
+                return $usuario;
             }
         }
         return false;
