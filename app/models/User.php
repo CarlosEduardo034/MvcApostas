@@ -11,9 +11,10 @@ class User {
 
     public function create($data) {
         $data['senha'] = password_hash($data['senha'], PASSWORD_DEFAULT);
-    
-        $stmt = $this->conn->prepare("INSERT INTO usuarios (nome, email, telefone, data_nasc, cpf, senha) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $data['nome'], $data['email'], $data['telefone'], $data['data_nascimento'], $data['cpf'], $data['senha']);
+        $role = isset($data['role']) ? $data['role'] : 'user';
+
+        $stmt = $this->conn->prepare("INSERT INTO usuarios (nome, email, telefone, data_nasc, cpf, senha, role) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssss", $data['nome'], $data['email'], $data['telefone'], $data['data_nascimento'], $data['cpf'], $data['senha'], $role);
         return $stmt->execute();
     }
 
@@ -46,11 +47,11 @@ class User {
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
-    
+
         if ($result->num_rows === 1) {
             $usuario = $result->fetch_assoc();
             if (password_verify($senha, $usuario['senha'])) {
-                return $usuario;
+                return $usuario; // contém 'role'
             }
         }
         return false;

@@ -1,34 +1,45 @@
 <?php
-require_once '../app/controllers/AuthController.php';
-
 $action = $_GET['action'] ?? 'login';
-$auth = new AuthController();
 
 switch ($action) {
     case 'login':
-        $auth->showLogin();
+        require_once '../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->showLogin();
         break;
+
     case 'register':
-        $auth->showRegister();
+        require_once '../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->showRegister();
         break;
+
     case 'do_register':
-        $auth->register();
+        require_once '../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->register();
         break;
+
     case 'do_login':
-        $auth->login();
+        require_once '../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->login();
         break;
-    case 'logout':
-        $auth->logout();
-        break;
+
     case 'dashboard':
-        session_start();
-        if (!isset($_SESSION['user'])) {
-            header("Location: /apostas_mvc_completo/public/index.php?action=login");
-            exit;
-        } else {
-            include '../app/views/dashboard.php';
-        }
+        require_once '../app/views/dashboard.php';
         break;
+
+    case 'principal':
+        require_once '../app/views/home/principal.php';
+        break;
+
+    case 'logout':
+        require_once '../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->logout();
+        break;
+
     default:
-        echo "Página não encontrada.";
+        echo "Ação inválida.";
 }

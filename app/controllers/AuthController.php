@@ -36,14 +36,19 @@ class AuthController {
         $user = new User();
         $email = $_POST['email'];
         $senha = $_POST['senha'];
-
+    
         $dados = $user->login($email, $senha);
-
+    
         if ($dados) {
             session_start();
             $_SESSION['email'] = $dados['email'];
-            $_SESSION['user'] = $dados; // agora é possível validar no dashboard
-            header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
+            $_SESSION['user'] = $dados;
+    
+            if ($dados['role'] === 'admin') {
+                header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
+            } else {
+                header("Location: /apostas_mvc_completo/public/index.php?action=principal");
+            }
             exit;
         } else {
             echo "Email ou senha incorretos.";
