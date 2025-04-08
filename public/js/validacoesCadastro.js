@@ -1,3 +1,52 @@
+document.addEventListener("DOMContentLoaded", () => {
+    let emailValido = true;
+    let cpfValido = true;
+    const emailInput = document.getElementById("email");
+    const cpfInput = document.getElementById("cpf");
+    const emailMsg = document.getElementById("email-msg");
+    const cpfMsg = document.getElementById("cpf-msg");
+
+    emailInput.addEventListener("blur", () => {
+        const email = emailInput.value;
+
+        fetch("/apostas_mvc_completo/public/verifica.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `email=${encodeURIComponent(email)}`
+        })
+            .then(res => res.text())
+            .then(res => {
+                if (res === "existe") {
+                    emailMsg.textContent = "Este e-mail já está em uso.";
+                    emailValido = false;
+                } else {
+                    emailMsg.textContent = "";
+                    emailValido = true;
+                }
+            });
+    });
+
+    cpfInput.addEventListener("blur", () => {
+        const cpf = cpfInput.value;
+    
+        fetch("/apostas_mvc_completo/public/verifica.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `cpf=${encodeURIComponent(cpf)}`
+        })
+            .then(res => res.text())
+            .then(res => {
+                if (res === "existe") {
+                    cpfMsg.textContent = "Este CPF já está em uso."; // Mensagem visual
+                    cpfValido = false;
+                } else {
+                    cpfMsg.textContent = "";
+                    cpfValido = true;
+                }
+            });
+    });
+});
+
 document.getElementById('submit').addEventListener('click', function (event) {
     const nome = document.getElementById('nome').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -6,7 +55,24 @@ document.getElementById('submit').addEventListener('click', function (event) {
     const cpf = document.getElementById('cpf').value.trim();
     const senha = document.getElementById('senha').value;
 
-    if(!nome){
+    const emailMsg = document.getElementById("email-msg").textContent;
+    const cpfMsg = document.getElementById("cpf-msg").textContent;
+
+    // Verificações visuais
+    if (emailMsg !== "") {
+        alert("Corrija o e-mail antes de prosseguir.");
+        event.preventDefault();
+        return;
+    }
+
+    if (cpfMsg !== "") {
+        alert("Corrija o CPF antes de prosseguir.");
+        event.preventDefault();
+        return;
+    }
+
+    // Demais validações já existentes
+    if (!nome) {
         alert("Por favor, preencha o nome.");
         event.preventDefault();
         return;
@@ -42,7 +108,6 @@ document.getElementById('submit').addEventListener('click', function (event) {
     const hoje = new Date();
     const idadeMinima = new Date();
     idadeMinima.setFullYear(hoje.getFullYear() - 18);
-
     const idadeMaxima = new Date("1900-01-01");
 
     if (nascimento > idadeMinima) {

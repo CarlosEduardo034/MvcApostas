@@ -25,6 +25,14 @@ class User {
         return $stmt->num_rows > 0;
     }
 
+    public function existsByCPF($cpf) {
+        $stmt = $this->conn->prepare("SELECT idUsuarios FROM usuarios WHERE cpf = ?");
+        $stmt->bind_param("s", $cpf);
+        $stmt->execute();
+        $stmt->store_result();
+        return $stmt->num_rows > 0;
+    }
+
     public function findByEmail($email) {
         $stmt = $this->conn->prepare("SELECT * FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);

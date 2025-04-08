@@ -34,6 +34,7 @@
                     <div class="user-box">
                         <input type="text" name="cpf" id="cpf" required="">
                         <label>CPF</label>
+                        <span id="cpf-msg" style="color:red; font-size: 0.9em; padding: 20px;"></span>
                     </div>
                     <div class="user-box">
                         <input type="password" name="senha" id="senha" required="">

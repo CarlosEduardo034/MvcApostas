@@ -13,12 +13,17 @@ class AuthController {
     public function register() {
         $user = new User();
         $data = $_POST;
-
+    
         if ($user->existsByEmail($data['email'])) {
             echo "Esse email já está sendo utilizado";
             return;
         }
-
+    
+        if ($user->existsByCPF($data['cpf'])) {
+            echo "Esse CPF já está sendo utilizado";
+            return;
+        }
+    
         if ($user->create($data)) {
             header("Location: /apostas_mvc_completo/public/index.php?action=login");
             exit;
