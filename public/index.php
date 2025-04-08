@@ -40,6 +40,23 @@ switch ($action) {
         $controller->logout();
         break;
 
+    case 'salvar_luta':
+        require_once '../app/controllers/LutaController.php';
+        $controller = new LutaController();
+        $controller->salvar();
+        break;
+
+    case 'excluir_luta':
+        require_once '../app/controllers/LutaController.php';
+        $controller = new LutaController();
+        $controller->excluir();
+        break;
+
+    case 'declarar_vencedor':
+        require_once '../app/controllers/LutaController.php';
+        $controller = new LutaController();
+        $controller->declararVencedor();
+        break;
     default:
         echo "Ação inválida.";
 }
