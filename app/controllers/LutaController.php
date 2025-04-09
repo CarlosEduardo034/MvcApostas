@@ -18,12 +18,23 @@ class LutaController {
             exit;
         }
     
+        $data = [
+            'evento_id' => $_POST['evento_id'],
+            'data_hora' => $_POST['data_hora'],
+            'tipo_luta' => $_POST['tipo_luta'],
+            'lutador1_nome' => $_POST['lutador1_nome'],
+            'lutador1_peso' => $_POST['lutador1_peso'],
+            'lutador2_nome' => $_POST['lutador2_nome'],
+            'lutador2_peso' => $_POST['lutador2_peso']
+        ];
+    
         $lutaModel = new Luta();
-        $lutaModel->criarLuta($_POST);
+        $lutaModel->criarLuta($data);
     
         header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
         exit;
     }
+    
     public function excluir() {
         $id = $_GET['id'] ?? null;
     
@@ -75,6 +86,12 @@ class LutaController {
         header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
         exit;
     }
-
+    public function novo(){
+        require_once __DIR__ . '/../models/Evento.php';
+        $eventoModel = new Evento();
+        $eventos = $eventoModel->listarEventos();
+    
+        require_once __DIR__ . '/../views/cadastrar_luta.php';
+    }
 }
 ?>

@@ -23,6 +23,10 @@ $lutas = $lutaModel->listarLutas();
         <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px;">
             <strong><?= htmlspecialchars($luta['tipo_luta']) ?></strong><br>
             <strong><?= date('d/m/Y H:i', strtotime($luta['data_hora'])) ?></strong><br>
+            <em>
+                Evento: <?= htmlspecialchars($luta['evento_nome']) ?> -
+                <?= date('d/m/Y H:i', strtotime($luta['evento_data'])) ?>
+            </em><br>
             <?= htmlspecialchars($luta['lutador1_nome']) ?> (<?= $luta['lutador1_peso'] ?> kg) x 
             <?= htmlspecialchars($luta['lutador2_nome']) ?> (<?= $luta['lutador2_peso'] ?> kg)<br><br>
 
@@ -39,3 +43,4 @@ $lutas = $lutaModel->listarLutas();
         </div>
     <?php endif; ?>
 <?php endforeach; ?>
+

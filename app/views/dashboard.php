@@ -10,17 +10,75 @@ if (trim(strtolower($_SESSION['user']['role'])) !== 'admin') {
 }
 
 require_once '../app/models/Luta.php';
-
+require_once '../app/models/Evento.php'; 
 $lutaModel = new Luta();
 $lutas = $lutaModel->listarLutas();
+
+$eventoModel = new Evento();
+$eventos = $eventoModel->listarEventos();
 
 echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome']) . "!</h2>";
 ?>
 
 <a href="/apostas_mvc_completo/public/index.php?action=logout">Sair</a>
+<h2>Cadastrar Evento</h2>
+<form method="POST" action="index.php?action=salvar_evento">
+    <input type="text" name="nome" placeholder="Nome do Evento" required>
+    <input type="datetime-local" name="data_evento" required>
+    <input type="text" name="local" placeholder="Local do Evento" required>
+    <button type="submit">Cadastrar</button>
+</form>
+
+<h3>Eventos Cadastrados</h3>
+<?php
+require_once '../app/models/Evento.php';
+$eventoModel = new Evento();
+$eventosListados = $eventoModel->listarEventos();
+?>
+
+<?php if (count($eventosListados) > 0): ?>
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>Nome do Evento</th>
+                <th>Data e Hora</th>
+                <th>Local</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($eventosListados as $evento): ?>
+                <tr>
+                    <td><?= htmlspecialchars($evento['nome']) ?></td>
+                    <td><?= date('d/m/Y H:i', strtotime($evento['data_evento'])) ?></td>
+                    <td><?= htmlspecialchars($evento['local']) ?></td>
+                    <td>
+                        <a href="index.php?action=excluir_evento&id=<?= $evento['id'] ?>" 
+                           style="color: red; text-decoration: none;">
+                            Excluir
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <p>Nenhum evento cadastrado ainda.</p>
+<?php endif; ?>
+
+<hr>
 
 <h3>Cadastrar Nova Luta</h3>
 <form action="/apostas_mvc_completo/public/index.php?action=salvar_luta" method="post">
+<label for="evento_id">Evento (Campeonato):</label>
+<select name="evento_id" required>
+    <option value="">Selecione um evento</option>
+    <?php foreach ($eventos as $evento): ?>
+        <option value="<?= $evento['id'] ?>">
+            <?= htmlspecialchars($evento['nome']) ?> - <?= date('d/m/Y H:i', strtotime($evento['data_evento'])) ?>
+        </option>
+    <?php endforeach; ?>
+</select> <br> <br>
 
     <label>Tipo de Luta:</label><br>
     <select name="tipo_luta" required>
@@ -59,7 +117,7 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                 <th>Lutador 2</th>
                 <th>Descrição 2</th>
                 <th>Modalidade</th>
-                <th>Vencedor</th>
+                <th>Ações</th>
                 <th>Vencedor</th>
                 <th>Status</th>
                 <th>Apostas no Lutador 1</th>
@@ -102,6 +160,13 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                     <td>R$ <?= number_format($luta['apostas_lutador2'], 2, ',', '.') ?></td>
                     <td>
                         R$ <?= number_format($luta['apostas_lutador1'] + $luta['apostas_lutador2'], 2, ',', '.') ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($luta['evento_nome'])): ?>
+                            <?= htmlspecialchars($luta['evento_nome']) ?> - <?= date('d/m/Y H:i', strtotime($luta['evento_data'])) ?>
+                        <?php else: ?>
+                            <em>Evento não vinculado</em>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
