@@ -16,6 +16,7 @@ class Luta {
                 lutador2_nome, lutador2_peso, status
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
+    
         $status = 'pendente';
         $stmt->bind_param(
             "sssssss",
@@ -30,9 +31,10 @@ class Luta {
     
         return $stmt->execute();
     }
+    
     public function listarLutas() {
-        $sql = "SELECT * FROM lutas ORDER BY data_hora DESC";
-        $result = $this->conn->query($sql);
+        $query = "SELECT * FROM lutas ORDER BY data_hora DESC";
+        $result = $this->conn->query($query);
     
         $lutas = [];
         while ($row = $result->fetch_assoc()) {
@@ -43,9 +45,19 @@ class Luta {
     }
     public function excluirLuta($id) {
         $stmt = $this->conn->prepare("DELETE FROM lutas WHERE id = ?");
+        if (!$stmt) {
+            die("Erro ao preparar: " . $this->conn->error);
+        }
+    
         $stmt->bind_param("i", $id);
-        return $stmt->execute();
+    
+        if (!$stmt->execute()) {
+            die("Erro ao executar: " . $stmt->error);
+        }
+    
+        $stmt->close();
     }
+    
     public function atualizarVencedor($id, $vencedor) {
         $stmt = $this->conn->prepare("
             UPDATE lutas 

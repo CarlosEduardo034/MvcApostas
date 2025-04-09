@@ -21,6 +21,7 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
 
 <h3>Cadastrar Nova Luta</h3>
 <form action="/apostas_mvc_completo/public/index.php?action=salvar_luta" method="post">
+
     <label>Tipo de Luta:</label><br>
     <select name="tipo_luta" required>
         <option value="">Selecione</option>
@@ -59,11 +60,12 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                 <th>Descrição 2</th>
                 <th>Modalidade</th>
                 <th>Vencedor</th>
-                <th>Tipo</th>
+                <th>Vencedor</th>
                 <th>Status</th>
                 <th>Apostas no Lutador 1</th>
                 <th>Apostas no Lutador 2</th>
                 <th>Total Apostado</th>
+                <th>Evento</th>
             </tr>
         </thead>
         <tbody>
@@ -77,11 +79,10 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                     <td><?= htmlspecialchars($luta['tipo_luta']) ?></td>
                     <td>
                         <a href="/apostas_mvc_completo/public/index.php?action=excluir_luta&id=<?= $luta['id'] ?>" 
-                        onclick="return confirm('Tem certeza que deseja excluir esta luta?');"
                         style="color: red; text-decoration: none;">Excluir</a>
                     </td>
                     <td>
-                        <?= $luta['vencedor'] ? htmlspecialchars($luta[$luta['vencedor'].'_nome']) : 'Vencedor' ?>
+                        <?= $luta['vencedor'] ? htmlspecialchars($luta[$luta['vencedor'].'_nome']) : 'Selecionar:' ?>
                         <?php if (!$luta['vencedor']): ?>
                             <form action="/apostas_mvc_completo/public/index.php?action=declarar_vencedor" method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="<?= $luta['id'] ?>">

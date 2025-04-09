@@ -25,22 +25,34 @@ class LutaController {
         exit;
     }
     public function excluir() {
-        session_start();
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-            echo "Acesso restrito.";
-            exit;
+        $id = $_GET['id'] ?? null;
+    
+        if ($id) {
+            $db = new Database();
+            $conn = $db->connect();
+            $stmt = $conn->prepare("SELECT COUNT(*) as total FROM apostas WHERE luta_id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $data = $result->fetch_assoc();
+    
+            if ($data['total'] > 0) {
+                echo "<script>
+                    alert('Não é possível apagar uma luta que possui apostas.');
+                    window.location.href = 'index.php?action=dashboard';
+                </script>";
+                return;
+            }
+    
+            // Exclusão segura
+            $luta = new Luta();
+            $luta->excluirLuta($id);
+    
+            echo "<script>
+                alert('Luta excluída com sucesso.');
+                window.location.href = 'index.php?action=dashboard';
+            </script>";
         }
-    
-        if (!isset($_GET['id'])) {
-            echo "ID da luta não fornecido.";
-            exit;
-        }
-    
-        $lutaModel = new Luta();
-        $lutaModel->excluirLuta($_GET['id']);
-    
-        header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
-        exit;
     }
     public function declararVencedor() {
         session_start();
@@ -63,5 +75,6 @@ class LutaController {
         header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
         exit;
     }
+
 }
 ?>
