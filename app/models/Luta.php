@@ -17,7 +17,7 @@ class Luta {
         ");
     
         $stmt->bind_param(
-            "isssdds", 
+            "isssdsd", 
             $data['evento_id'],
             $data['tipo_luta'],
             $data['data_hora'],
@@ -32,14 +32,18 @@ class Luta {
     
     public function listarLutas() {
         $sql = "
-            SELECT 
-                l.*, 
-                e.nome AS evento_nome, 
-                e.data_evento AS evento_data
-            FROM lutas l
-            LEFT JOIN eventos e ON l.evento_id = e.id
-            ORDER BY l.data_hora ASC
-        ";
+        SELECT l.*, 
+           IFNULL(SUM(CASE WHEN a.escolha = 'lutador1' THEN a.valor ELSE 0 END), 0) AS apostas_lutador1,
+           IFNULL(SUM(CASE WHEN a.escolha = 'lutador2' THEN a.valor ELSE 0 END), 0) AS apostas_lutador2,
+           e.nome AS evento_nome,
+           e.data_evento AS evento_data
+    FROM lutas l
+    LEFT JOIN apostas a ON l.id = a.luta_id
+    LEFT JOIN eventos e ON l.evento_id = e.id
+    GROUP BY l.id
+    ORDER BY l.data_hora ASC
+";
+
         $result = $this->conn->query($sql);
         $lutas = [];
     
@@ -49,8 +53,6 @@ class Luta {
     
         return $lutas;
     }
-    
-    
     public function excluirLuta($id) {
         $stmt = $this->conn->prepare("DELETE FROM lutas WHERE id = ?");
         if (!$stmt) {
@@ -65,7 +67,6 @@ class Luta {
     
         $stmt->close();
     }
-    
     public function atualizarVencedor($id, $vencedor) {
         $stmt = $this->conn->prepare("
             UPDATE lutas 

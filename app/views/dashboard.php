@@ -24,7 +24,7 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
 <h2>Cadastrar Evento</h2>
 <form method="POST" action="index.php?action=salvar_evento">
     <input type="text" name="nome" placeholder="Nome do Evento" required>
-    <input type="datetime-local" name="data_evento" required>
+    <input type="datetime-local" name="data_evento" required min="<?= date('Y-m-d\TH:i') ?>">
     <input type="text" name="local" placeholder="Local do Evento" required>
     <button type="submit">Cadastrar</button>
 </form>
@@ -53,11 +53,9 @@ $eventosListados = $eventoModel->listarEventos();
                     <td><?= date('d/m/Y H:i', strtotime($evento['data_evento'])) ?></td>
                     <td><?= htmlspecialchars($evento['local']) ?></td>
                     <td>
-                        <a href="index.php?action=excluir_evento&id=<?= $evento['id'] ?>" 
-                           style="color: red; text-decoration: none;">
-                            Excluir
-                        </a>
-                    </td>
+                        <a href="/apostas_mvc_completo/public/index.php?action=editar_evento&id=<?= $evento['id'] ?>">Editar</a> |
+                        <a href="/apostas_mvc_completo/public/index.php?action=excluir_evento&id=<?= $evento['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir este evento?')">Excluir</a>
+                    </td>   
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -71,10 +69,10 @@ $eventosListados = $eventoModel->listarEventos();
 <h3>Cadastrar Nova Luta</h3>
 <form action="/apostas_mvc_completo/public/index.php?action=salvar_luta" method="post">
 <label for="evento_id">Evento (Campeonato):</label>
-<select name="evento_id" required>
+<select name="evento_id" id="evento_id" required>
     <option value="">Selecione um evento</option>
     <?php foreach ($eventos as $evento): ?>
-        <option value="<?= $evento['id'] ?>">
+        <option value="<?= $evento['id'] ?>" data-data-evento="<?= date('Y-m-d\TH:i', strtotime($evento['data_evento'])) ?>">
             <?= htmlspecialchars($evento['nome']) ?> - <?= date('d/m/Y H:i', strtotime($evento['data_evento'])) ?>
         </option>
     <?php endforeach; ?>
@@ -91,7 +89,8 @@ $eventosListados = $eventoModel->listarEventos();
     </select><br><br>
 
     <label>Data e Hora:</label><br>
-    <input type="datetime-local" name="data_hora" required min="<?= date('Y-m-d\TH:i') ?>"><br><br>
+    <input type="datetime-local" name="data_hora" id="data_hora" required>
+    <br><br>
 
     <label>Lutador 1 - Nome:</label><br>
     <input type="text" name="lutador1_nome" required><br>
@@ -105,6 +104,18 @@ $eventosListados = $eventoModel->listarEventos();
 
     <button type="submit">Salvar Luta</button>
 </form>
+<script>
+document.getElementById('evento_id').addEventListener('change', function () {
+    const selectedOption = this.options[this.selectedIndex];
+    const dataEvento = selectedOption.getAttribute('data-data-evento');
+
+    if (dataEvento) {
+        document.getElementById('data_hora').setAttribute('min', dataEvento);
+    } else {
+        document.getElementById('data_hora').removeAttribute('min');
+    }
+});
+</script>
 
 <h3>Lutas Cadastradas</h3>
 <?php if (count($lutas) > 0): ?>
@@ -141,17 +152,20 @@ $eventosListados = $eventoModel->listarEventos();
                     </td>
                     <td>
                         <?= $luta['vencedor'] ? htmlspecialchars($luta[$luta['vencedor'].'_nome']) : 'Selecionar:' ?>
-                        <?php if (!$luta['vencedor']): ?>
-                            <form action="/apostas_mvc_completo/public/index.php?action=declarar_vencedor" method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="<?= $luta['id'] ?>">
+                        <form action="/apostas_mvc_completo/public/index.php?action=declarar_vencedor" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="<?= $luta['id'] ?>">
                                 <select name="vencedor" required>
                                     <option value="">--Selecionar--</option>
-                                    <option value="lutador1"><?= htmlspecialchars($luta['lutador1_nome']) ?></option>
-                                    <option value="lutador2"><?= htmlspecialchars($luta['lutador2_nome']) ?></option>
+                                    <option value="lutador1" <?= $luta['vencedor'] === 'lutador1' ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($luta['lutador1_nome']) ?>
+                                    </option>
+                                    <option value="lutador2" <?= $luta['vencedor'] === 'lutador2' ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($luta['lutador2_nome']) ?>
+                                    </option>
                                 </select>
-                                <button type="submit">Salvar</button>
-                            </form>
-                        <?php endif; ?>
+                            <button type="submit">Salvar</button>
+                        </form>
+
                     </td>
                     <td>
                         <?= $luta['status'] === 'concluido' ? 'Evento Concluído' : 'Evento Pendente' ?>

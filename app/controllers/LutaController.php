@@ -9,18 +9,40 @@ class LutaController {
             exit;
         }
     
-        $dataHora = $_POST['data_hora'];
-        $agora = date('Y-m-d H:i:s');
+        $eventoId = $_POST['evento_id'];
+        $dataHoraLuta = $_POST['data_hora'];
     
-        if ($dataHora < $agora) {
-            echo "Erro: A luta não pode ser cadastrada com data/hora anterior à atual.";
-            echo '<br><a href="/apostas_mvc_completo/public/index.php?action=dashboard">Voltar</a>';
+        require_once __DIR__ . '/../models/Evento.php';
+        $eventoModel = new Evento();
+        $eventos = $eventoModel->listarEventos();
+
+        $eventoSelecionado = null;
+        foreach ($eventos as $evento) {
+            if ($evento['id'] == $eventoId) {
+                $eventoSelecionado = $evento;
+                break;
+            }
+        }
+    
+        if (!$eventoSelecionado) {
+            echo "<script>
+                alert('Erro: Evento não encontrado.');
+                window.location.href = '/apostas_mvc_completo/public/index.php?action=dashboard';
+            </script>";
+            exit;
+        }
+    
+        if ($dataHoraLuta < $eventoSelecionado['data_evento']) {
+            echo "<script>
+                alert('Erro: A luta não pode ocorrer antes da data do evento.');
+                window.location.href = '/apostas_mvc_completo/public/index.php?action=dashboard';
+            </script>";
             exit;
         }
     
         $data = [
-            'evento_id' => $_POST['evento_id'],
-            'data_hora' => $_POST['data_hora'],
+            'evento_id' => $eventoId,
+            'data_hora' => $dataHoraLuta,
             'tipo_luta' => $_POST['tipo_luta'],
             'lutador1_nome' => $_POST['lutador1_nome'],
             'lutador1_peso' => $_POST['lutador1_peso'],
@@ -34,6 +56,7 @@ class LutaController {
         header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
         exit;
     }
+    
     
     public function excluir() {
         $id = $_GET['id'] ?? null;
@@ -55,7 +78,6 @@ class LutaController {
                 return;
             }
     
-            // Exclusão segura
             $luta = new Luta();
             $luta->excluirLuta($id);
     
@@ -65,6 +87,7 @@ class LutaController {
             </script>";
         }
     }
+    
     public function declararVencedor() {
         session_start();
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {

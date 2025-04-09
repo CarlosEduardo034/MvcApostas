@@ -28,10 +28,51 @@ class Evento {
         return $eventos;
     }
 
-    public function excluirEvento($id) {
-        $stmt = $this->conn->prepare("DELETE FROM eventos WHERE id = ?");
+    public function excluirEvento() {
+        $id = $_GET['id'] ?? null;
+    
+        if ($id) {
+            $db = new Database();
+            $conn = $db->connect();
+    
+            $stmt = $conn->prepare("SELECT COUNT(*) as total FROM lutas WHERE evento_id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $data = $result->fetch_assoc();
+    
+            if ($data['total'] > 0) {
+                echo "<script>
+                    alert('Não é possível excluir este evento, pois ele possui lutas cadastradas.');
+                    window.location.href = 'index.php?action=dashboard';
+                </script>";
+                return;
+            }
+    
+            $stmt = $conn->prepare("DELETE FROM eventos WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+    
+            echo "<script>
+                alert('Evento excluído com sucesso.');
+                window.location.href = 'index.php?action=dashboard';
+            </script>";
+        }
+    }
+    public function buscarEventoPorId($id) {
+        $stmt = $this->conn->prepare("SELECT * FROM eventos WHERE id = ?");
         $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
+    }
+    
+    public function atualizarEvento($id, $nome, $data_evento, $local) {
+        $stmt = $this->conn->prepare("UPDATE eventos SET nome = ?, data_evento = ?, local = ? WHERE id = ?");
+        $stmt->bind_param("sssi", $nome, $data_evento, $local, $id);
         return $stmt->execute();
     }
+    
+    
 }
 ?>

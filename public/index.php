@@ -75,6 +75,18 @@ switch ($action) {
         $controller = new EventoController();
         $controller->excluir();
         break;
+
+    case 'editar_evento':
+        require_once '../app/controllers/EventoController.php';
+        $controller = new EventoController();
+        $controller->editar();
+        break;
+        
+    case 'atualizar_evento':
+        require_once '../app/controllers/EventoController.php';
+        $controller = new EventoController();
+        $controller->atualizar();
+        break;
     default:
         echo "Ação inválida.";
 }
