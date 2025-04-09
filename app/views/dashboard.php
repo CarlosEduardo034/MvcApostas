@@ -24,13 +24,21 @@ $lutas = $lutaModel->listarLutas($eventoSelecionado, $statusSelecionado);
 $tiposLuta = $lutaModel->listarTiposLuta();
 $tipoSelecionado = $_GET['tipo_luta'] ?? '';
 
-$lutas = array_filter($lutas, function($luta) use ($eventoSelecionado, $statusSelecionado, $tipoSelecionado) {
+$dataUnica = $_GET['data_unica'] ?? '';
+
+$lutas = array_filter($lutas, function($luta) use (
+    $eventoSelecionado, $statusSelecionado, $tipoSelecionado, $dataUnica
+) {
     if (!empty($eventoSelecionado) && $luta['evento_id'] != $eventoSelecionado) return false;
     if (!empty($statusSelecionado) && $luta['status'] != $statusSelecionado) return false;
     if (!empty($tipoSelecionado) && $luta['tipo_luta'] != $tipoSelecionado) return false;
+    if (!empty($dataUnica)) {
+        $dataLuta = date('Y-m-d', strtotime($luta['data_hora']));
+        if ($dataLuta !== $dataUnica) return false;
+    }
+
     return true;
 });
-
 echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome']) . "!</h2>";
 ?>
 
@@ -162,7 +170,10 @@ document.getElementById('evento_id').addEventListener('change', function () {
                 </option>
             <?php endforeach; ?>
         </select>
-        
+
+    <label for="data_unica">Data:</label>
+    <input type="date" name="data_unica" id="data_unica" value="<?= $_GET['data_unica'] ?? '' ?>">
+  
     <button type="submit">Filtrar</button>
 </form>
 
@@ -247,4 +258,7 @@ document.getElementById('evento_id').addEventListener('change', function () {
             }
         ?>
     </p>
+<?php endif; ?>
+<?php if (empty($lutas)): ?>
+    <p style="color: red;">Nenhuma luta encontrada com os filtros aplicados.</p>
 <?php endif; ?>
