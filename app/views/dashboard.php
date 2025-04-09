@@ -17,6 +17,20 @@ $lutas = $lutaModel->listarLutas();
 $eventoModel = new Evento();
 $eventos = $eventoModel->listarEventos();
 
+$eventoSelecionado = $_GET['evento_id'] ?? null;
+$statusSelecionado = $_GET['status'] ?? null;
+$lutas = $lutaModel->listarLutas($eventoSelecionado, $statusSelecionado);
+
+$tiposLuta = $lutaModel->listarTiposLuta();
+$tipoSelecionado = $_GET['tipo_luta'] ?? '';
+
+$lutas = array_filter($lutas, function($luta) use ($eventoSelecionado, $statusSelecionado, $tipoSelecionado) {
+    if (!empty($eventoSelecionado) && $luta['evento_id'] != $eventoSelecionado) return false;
+    if (!empty($statusSelecionado) && $luta['status'] != $statusSelecionado) return false;
+    if (!empty($tipoSelecionado) && $luta['tipo_luta'] != $tipoSelecionado) return false;
+    return true;
+});
+
 echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome']) . "!</h2>";
 ?>
 
@@ -118,6 +132,41 @@ document.getElementById('evento_id').addEventListener('change', function () {
 </script>
 
 <h3>Lutas Cadastradas</h3>
+
+<form method="get" action="/apostas_mvc_completo/public/index.php" style="margin-bottom: 20px;">
+    <input type="hidden" name="action" value="dashboard">
+
+    <label for="evento_id">Filtrar por Evento:</label>
+    <select name="evento_id" id="evento_id">
+        <option value="">Todos</option>
+        <?php foreach ($eventos as $evento): ?>
+            <option value="<?= $evento['id'] ?>" <?= (isset($_GET['evento_id']) && $_GET['evento_id'] == $evento['id']) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($evento['nome']) ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+
+    <label for="status">Status:</label>
+    <select name="status" id="status">
+        <option value="">Todos</option>
+        <option value="pendente" <?= (isset($_GET['status']) && $_GET['status'] === 'pendente') ? 'selected' : '' ?>>Pendente</option>
+        <option value="concluido" <?= (isset($_GET['status']) && $_GET['status'] === 'concluido') ? 'selected' : '' ?>>Concluído</option>
+    </select>
+
+    <label for="tipo_luta">Tipo de Luta:</label>
+        <select name="tipo_luta" id="tipo_luta">
+            <option value="">Todas</option>
+            <?php foreach ($tiposLuta as $tipo): ?>
+                <option value="<?= htmlspecialchars($tipo) ?>" <?= $tipoSelecionado === $tipo ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($tipo) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        
+    <button type="submit">Filtrar</button>
+</form>
+
+
 <?php if (count($lutas) > 0): ?>
     <table border="1" cellpadding="10">
         <thead>
@@ -187,5 +236,15 @@ document.getElementById('evento_id').addEventListener('change', function () {
         </tbody>
     </table>
 <?php else: ?>
-    <p>Nenhuma luta cadastrada ainda.</p>
+    <p>
+        <?php
+            if (!empty($statusSelecionado)) {
+                echo "Nenhuma luta com status <strong>" . htmlspecialchars($statusSelecionado) . "</strong>.";
+            } elseif (!empty($eventoSelecionado)) {
+                echo "Nenhuma luta vinculada ao evento selecionado.";
+            } else {
+                echo "Nenhuma luta cadastrada ainda.";
+            }
+        ?>
+    </p>
 <?php endif; ?>
