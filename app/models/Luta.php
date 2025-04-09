@@ -64,21 +64,6 @@ class Luta {
         $stmt->bind_param("di", $valor, $luta_id);
         return $stmt->execute();
     }
-    public function calcularOdds($luta) {
-        $total = $luta['apostas_lutador1'] + $luta['apostas_lutador2'];
-    
-        if ($total == 0) {
-            return [
-                'lutador1' => 1.0,
-                'lutador2' => 1.0
-            ];
-        }
-    
-        return [
-            'lutador1' => $luta['apostas_lutador1'] > 0 ? $total / $luta['apostas_lutador1'] : 1.0,
-            'lutador2' => $luta['apostas_lutador2'] > 0 ? $total / $luta['apostas_lutador2'] : 1.0
-        ];
-    }
     
 }
 ?>

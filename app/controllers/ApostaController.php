@@ -18,7 +18,6 @@ class ApostaController {
         $apostaModel = new Aposta();
         $apostaModel->registrarAposta($usuario_id, $luta_id, $valor, $escolha);
 
-        // Atualizar os totais de apostas da luta
         $lutaModel = new Luta();
         $lutaModel->atualizarTotaisAposta($luta_id, $valor, $escolha);
 

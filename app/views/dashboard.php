@@ -64,12 +64,9 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                 <th>Apostas no Lutador 1</th>
                 <th>Apostas no Lutador 2</th>
                 <th>Total Apostado</th>
-                <th>Odds - <?= htmlspecialchars($luta['lutador1_nome']) ?></th>
-                <th>Odds - <?= htmlspecialchars($luta['lutador2_nome']) ?></th>
             </tr>
         </thead>
         <tbody>
-            <?php $odds = $lutaModel->calcularOdds($luta); ?>
             <?php foreach ($lutas as $luta): ?>
                 <tr>
                     <td><?= htmlspecialchars($luta['data_hora']) ?></td>
@@ -105,8 +102,6 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
                     <td>
                         R$ <?= number_format($luta['apostas_lutador1'] + $luta['apostas_lutador2'], 2, ',', '.') ?>
                     </td>
-                    <td><?= number_format($odds['lutador1'], 2, ',', '.') ?>x</td>
-                    <td><?= number_format($odds['lutador2'], 2, ',', '.') ?>x</td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
