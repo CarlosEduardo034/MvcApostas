@@ -182,34 +182,37 @@ document.getElementById('evento_id').addEventListener('change', function () {
     <table border="1" cellpadding="10">
         <thead>
             <tr>
-                <th>Data e Hora</th>
+                <th>Evento</th>
+                <th>Marcada para</th>
                 <th>Lutador 1</th>
-                <th>Descrição 1</th>
+                <th>Peso</th>
                 <th>Lutador 2</th>
-                <th>Descrição 2</th>
+                <th>Peso</th>
                 <th>Modalidade</th>
-                <th>Ações</th>
                 <th>Vencedor</th>
                 <th>Status</th>
+                <th>Ações</th>
                 <th>Apostas no Lutador 1</th>
                 <th>Apostas no Lutador 2</th>
                 <th>Total Apostado</th>
-                <th>Evento</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($lutas as $luta): ?>
                 <tr>
+                    <td>
+                        <?php if (!empty($luta['evento_nome'])): ?>
+                            <?= htmlspecialchars($luta['evento_nome']) ?> - <?= date('d/m/Y H:i', strtotime($luta['evento_data'])) ?>
+                        <?php else: ?>
+                            <em>Evento não vinculado</em>
+                        <?php endif; ?>
+                    </td>
                     <td><?= htmlspecialchars($luta['data_hora']) ?></td>
                     <td><?= htmlspecialchars($luta['lutador1_nome']) ?></td>
                     <td><?= htmlspecialchars($luta['lutador1_peso']) ?> kg</td>
                     <td><?= htmlspecialchars($luta['lutador2_nome']) ?></td>
                     <td><?= htmlspecialchars($luta['lutador2_peso']) ?> kg</td>
                     <td><?= htmlspecialchars($luta['tipo_luta']) ?></td>
-                    <td>
-                        <a href="/apostas_mvc_completo/public/index.php?action=excluir_luta&id=<?= $luta['id'] ?>" 
-                        style="color: red; text-decoration: none;">Excluir</a>
-                    </td>
                     <td>
                         <?= $luta['vencedor'] ? htmlspecialchars($luta[$luta['vencedor'].'_nome']) : 'Selecionar:' ?>
                         <form action="/apostas_mvc_completo/public/index.php?action=declarar_vencedor" method="post" style="display:inline;">
@@ -225,22 +228,18 @@ document.getElementById('evento_id').addEventListener('change', function () {
                                 </select>
                             <button type="submit">Salvar</button>
                         </form>
-
                     </td>
                     <td>
                         <?= $luta['status'] === 'concluido' ? 'Evento Concluído' : 'Evento Pendente' ?>
+                    </td>
+                    <td>
+                        <a href="/apostas_mvc_completo/public/index.php?action=excluir_luta&id=<?= $luta['id'] ?>" 
+                        style="color: red; text-decoration: none;">Excluir</a>
                     </td>
                     <td>R$ <?= number_format($luta['apostas_lutador1'], 2, ',', '.') ?></td>
                     <td>R$ <?= number_format($luta['apostas_lutador2'], 2, ',', '.') ?></td>
                     <td>
                         R$ <?= number_format($luta['apostas_lutador1'] + $luta['apostas_lutador2'], 2, ',', '.') ?>
-                    </td>
-                    <td>
-                        <?php if (!empty($luta['evento_nome'])): ?>
-                            <?= htmlspecialchars($luta['evento_nome']) ?> - <?= date('d/m/Y H:i', strtotime($luta['evento_data'])) ?>
-                        <?php else: ?>
-                            <em>Evento não vinculado</em>
-                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
