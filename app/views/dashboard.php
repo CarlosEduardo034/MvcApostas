@@ -195,6 +195,7 @@ document.getElementById('evento_id').addEventListener('change', function () {
                 <th>Apostas no Lutador 1</th>
                 <th>Apostas no Lutador 2</th>
                 <th>Total Apostado</th>
+                <th>Odds</th>
             </tr>
         </thead>
         <tbody>
@@ -240,6 +241,13 @@ document.getElementById('evento_id').addEventListener('change', function () {
                     <td>R$ <?= number_format($luta['apostas_lutador2'], 2, ',', '.') ?></td>
                     <td>
                         R$ <?= number_format($luta['apostas_lutador1'] + $luta['apostas_lutador2'], 2, ',', '.') ?>
+                    </td>
+                    <td>
+                        <p>
+                            <?php echo $luta['lutador1_nome']; ?>: <?php echo $luta['odds_lutador1'];?> 
+                            <br>
+                            <?php echo $luta['lutador2_nome']; ?>: <?php echo $luta['odds_lutador2'];?>
+                        </p>
                     </td>
                 </tr>
             <?php endforeach; ?>

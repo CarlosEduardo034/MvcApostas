@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/Luta.php'; // necessário para atualizar totais
 
 class Aposta {
     private $conn;
@@ -15,6 +16,24 @@ class Aposta {
             VALUES (?, ?, ?, ?)
         ");
         $stmt->bind_param("iids", $usuario_id, $luta_id, $valor, $escolha);
+        $success = $stmt->execute();
+
+        if ($success) {
+            $lutaModel = new Luta();
+            $lutaModel->atualizarTotaisAposta($luta_id, $valor, $escolha);
+        }
+
+        return $success;
+    }
+
+    public function atualizarTotaisAposta($luta_id, $valor, $escolha) {
+        $campo = $escolha === 'lutador1' ? 'apostas_lutador1' : 'apostas_lutador2';
+    
+        $stmt = $this->conn->prepare("
+            UPDATE lutas SET $campo = $campo + ? WHERE id = ?
+        ");
+        $stmt->bind_param("di", $valor, $luta_id);
         return $stmt->execute();
     }
+    
 }

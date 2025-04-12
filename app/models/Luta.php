@@ -62,11 +62,15 @@ class Luta {
         $lutas = [];
     
         while ($row = $result->fetch_assoc()) {
+            $odds = $this->calcularOdds($row['id']);
+            $row['odds_lutador1'] = $odds['lutador1'];
+            $row['odds_lutador2'] = $odds['lutador2'];
+    
             $lutas[] = $row;
         }
     
         return $lutas;
-    }
+    }    
     
     public function listarTiposLuta() {
         $result = $this->conn->query("SELECT DISTINCT tipo_luta FROM lutas ORDER BY tipo_luta ASC");
@@ -78,7 +82,6 @@ class Luta {
     
         return $tipos;
     }
-    
     
     public function excluirLuta($id) {
         $stmt = $this->conn->prepare("DELETE FROM lutas WHERE id = ?");
@@ -112,6 +115,25 @@ class Luta {
         $stmt->bind_param("di", $valor, $luta_id);
         return $stmt->execute();
     }
+
+    public function calcularOdds($lutaId) {
+        $stmt = $this->conn->prepare("SELECT apostas_lutador1, apostas_lutador2 FROM lutas WHERE id = ?");
+        $stmt->bind_param("i", $lutaId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
     
+        $apostador1 = $result['apostas_lutador1'];
+        $apostador2 = $result['apostas_lutador2'];
+        $total = $apostador1 + $apostador2;
+    
+        if ($total == 0) {
+            return ['lutador1' => 1.00, 'lutador2' => 1.00];
+        }
+    
+        $odds1 = $apostador1 > 0 ? round($total / $apostador1, 2) : 99.99;
+        $odds2 = $apostador2 > 0 ? round($total / $apostador2, 2) : 99.99;
+    
+        return ['lutador1' => $odds1, 'lutador2' => $odds2];
+    }    
 }
 ?>

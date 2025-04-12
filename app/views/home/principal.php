@@ -20,6 +20,9 @@ $lutas = $lutaModel->listarLutas();
 
 <?php foreach ($lutas as $luta): ?>
     <?php if ($luta['status'] === 'pendente'): ?>
+        <?php
+            $odds = $lutaModel->calcularOdds($luta['id']);
+        ?>
         <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px;">
             <strong><?= htmlspecialchars($luta['tipo_luta']) ?></strong><br>
             <strong><?= date('d/m/Y H:i', strtotime($luta['data_hora'])) ?></strong><br>
@@ -33,8 +36,10 @@ $lutas = $lutaModel->listarLutas();
             <form action="/apostas_mvc_completo/public/index.php?action=apostar" method="post">
                 <input type="hidden" name="luta_id" value="<?= $luta['id'] ?>">
                 <label>Escolha seu lutador:</label><br>
-                <input type="radio" name="escolha" value="lutador1" required> <?= $luta['lutador1_nome'] ?><br>
-                <input type="radio" name="escolha" value="lutador2" required> <?= $luta['lutador2_nome'] ?><br><br>
+                <input type="radio" name="escolha" value="lutador1" required> 
+                <?= htmlspecialchars($luta['lutador1_nome']) ?> (Odd: <?= number_format($odds['lutador1'], 2) ?>)<br>
+                <input type="radio" name="escolha" value="lutador2" required> 
+                <?= htmlspecialchars($luta['lutador2_nome']) ?> (Odd: <?= number_format($odds['lutador2'], 2) ?>)<br><br>
 
                 <label>Valor da Aposta (R$):</label><br>
                 <input type="number" name="valor" min="1" step="0.01" required><br><br>
@@ -43,4 +48,3 @@ $lutas = $lutaModel->listarLutas();
         </div>
     <?php endif; ?>
 <?php endforeach; ?>
-
