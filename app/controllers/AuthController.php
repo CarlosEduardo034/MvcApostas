@@ -19,7 +19,7 @@ class AuthController {
         $dataNascimento = filter_input(INPUT_POST, 'data_nascimento', FILTER_UNSAFE_RAW);
     
         if (!$nome || !$email || !$cpf || !$senha || !$telefone || !$dataNascimento) {
-            $_SESSION['mensagem'] = "Todos os campos são obrigatórios.";
+            $_SESSION['mensagem'] = "Todos os campos são obrigatórios...";
             header("Location: /apostas_mvc_completo/public/index.php?action=register");
             exit;
         }

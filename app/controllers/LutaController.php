@@ -6,10 +6,15 @@ class LutaController {
             echo "Acesso restrito.";
             exit;
         }
-    
-        $eventoId = $_POST['evento_id'];
-        $dataHoraLuta = $_POST['data_hora'];
-    
+
+        $eventoId = filter_input(INPUT_POST, 'evento_id', FILTER_VALIDATE_INT);
+        $dataHoraLuta = filter_input(INPUT_POST, 'data_hora', FILTER_SANITIZE_STRING);
+
+        if (!$eventoId || !$dataHoraLuta) {
+            echo "Dados inválidos.";
+            exit;
+        }
+
         require_once __DIR__ . '/../models/Evento.php';
         $eventoModel = new Evento();
         $eventos = $eventoModel->listarEventos();
@@ -21,7 +26,7 @@ class LutaController {
                 break;
             }
         }
-    
+
         if (!$eventoSelecionado) {
             echo "<script>
                 alert('Erro: Evento não encontrado.');
@@ -29,7 +34,7 @@ class LutaController {
             </script>";
             exit;
         }
-    
+
         if ($dataHoraLuta < $eventoSelecionado['data_evento']) {
             echo "<script>
                 alert('Erro: A luta não pode ocorrer antes da data do evento.');
@@ -37,28 +42,33 @@ class LutaController {
             </script>";
             exit;
         }
-    
+
         $data = [
             'evento_id' => $eventoId,
             'data_hora' => $dataHoraLuta,
-            'tipo_luta' => $_POST['tipo_luta'],
-            'lutador1_nome' => $_POST['lutador1_nome'],
-            'lutador1_peso' => $_POST['lutador1_peso'],
-            'lutador2_nome' => $_POST['lutador2_nome'],
-            'lutador2_peso' => $_POST['lutador2_peso']
+            'tipo_luta' => filter_input(INPUT_POST, 'tipo_luta', FILTER_SANITIZE_STRING),
+            'lutador1_nome' => filter_input(INPUT_POST, 'lutador1_nome', FILTER_SANITIZE_SPECIAL_CHARS),
+            'lutador1_peso' => filter_input(INPUT_POST, 'lutador1_peso', FILTER_VALIDATE_FLOAT),
+            'lutador2_nome' => filter_input(INPUT_POST, 'lutador2_nome', FILTER_SANITIZE_SPECIAL_CHARS),
+            'lutador2_peso' => filter_input(INPUT_POST, 'lutador2_peso', FILTER_VALIDATE_FLOAT),
         ];
-    
+
+        if (!$data['tipo_luta'] || !$data['lutador1_nome'] || !$data['lutador1_peso'] ||
+            !$data['lutador2_nome'] || !$data['lutador2_peso']) {
+            echo "Todos os campos devem ser preenchidos corretamente...";
+            exit;
+        }
+
         $lutaModel = new Luta();
         $lutaModel->criarLuta($data);
-    
+
         header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
         exit;
     }
-    
-    
+
     public function excluir() {
-        $id = $_GET['id'] ?? null;
-    
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
         if ($id) {
             $db = new Database();
             $conn = $db->connect();
@@ -67,7 +77,7 @@ class LutaController {
             $stmt->execute();
             $result = $stmt->get_result();
             $data = $result->fetch_assoc();
-    
+
             if ($data['total'] > 0) {
                 echo "<script>
                     alert('Não é possível apagar uma luta que possui apostas.');
@@ -75,43 +85,46 @@ class LutaController {
                 </script>";
                 return;
             }
-    
+
             $luta = new Luta();
             $luta->excluirLuta($id);
-    
+
             echo "<script>
                 alert('Luta excluída com sucesso.');
                 window.location.href = 'index.php?action=dashboard';
             </script>";
+        } else {
+            echo "ID inválido.";
         }
     }
-    
+
     public function declararVencedor() {
         session_start();
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             echo "Acesso restrito.";
             exit;
         }
-    
-        $id = $_POST['id'];
-        $vencedor = $_POST['vencedor'];
-    
-        if ($vencedor !== 'lutador1' && $vencedor !== 'lutador2') {
-            echo "Vencedor inválido.";
+
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+        $vencedor = filter_input(INPUT_POST, 'vencedor', FILTER_SANITIZE_STRING);
+
+        if (!$id || ($vencedor !== 'lutador1' && $vencedor !== 'lutador2')) {
+            echo "Dados inválidos.";
             exit;
         }
-    
+
         $model = new Luta();
         $model->atualizarVencedor($id, $vencedor);
-    
+
         header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
         exit;
     }
-    public function novo(){
+
+    public function novo() {
         require_once __DIR__ . '/../models/Evento.php';
         $eventoModel = new Evento();
         $eventos = $eventoModel->listarEventos();
-    
+
         require_once __DIR__ . '/../views/cadastrar_luta.php';
     }
 }

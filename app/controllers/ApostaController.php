@@ -15,7 +15,7 @@ class ApostaController {
         $valor = filter_input(INPUT_POST, 'valor', FILTER_VALIDATE_FLOAT);
 
         if (!$luta_id || !$valor || !in_array($escolha, ['lutador1', 'lutador2']) || $valor <= 0) {
-            $_SESSION['mensagem'] = "Dados inválidos para aposta.";
+            $_SESSION['mensagem'] = "Dados inválidos para aposta...";
             header("Location: /apostas_mvc_completo/public/index.php?action=principal");
             exit;
         }
