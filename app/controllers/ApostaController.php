@@ -1,7 +1,4 @@
 <?php
-require_once '../app/models/Aposta.php';
-require_once '../app/models/Luta.php';
-
 class ApostaController {
     public function apostar() {
         session_start();
@@ -12,11 +9,12 @@ class ApostaController {
         }
 
         $usuario_id = $_SESSION['user']['idUsuarios'];
-        $luta_id = isset($_POST['luta_id']) ? intval($_POST['luta_id']) : null;
-        $escolha = $_POST['escolha'] ?? null;
-        $valor = isset($_POST['valor']) ? floatval($_POST['valor']) : 0;
 
-        if (!$luta_id || !in_array($escolha, ['lutador1', 'lutador2']) || $valor <= 0) {
+        $luta_id = filter_input(INPUT_POST, 'luta_id', FILTER_VALIDATE_INT);
+        $escolha = filter_input(INPUT_POST, 'escolha', FILTER_SANITIZE_STRING);
+        $valor = filter_input(INPUT_POST, 'valor', FILTER_VALIDATE_FLOAT);
+
+        if (!$luta_id || !$valor || !in_array($escolha, ['lutador1', 'lutador2']) || $valor <= 0) {
             $_SESSION['mensagem'] = "Dados inválidos para aposta.";
             header("Location: /apostas_mvc_completo/public/index.php?action=principal");
             exit;

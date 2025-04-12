@@ -1,6 +1,4 @@
 <?php
-require_once '../app/models/Evento.php';
-
 class EventoController {
     public function salvar() {
         session_start();

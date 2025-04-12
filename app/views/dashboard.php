@@ -255,17 +255,8 @@ document.getElementById('evento_id').addEventListener('change', function () {
     </table>
 <?php else: ?>
     <p>
-        <?php
-            if (!empty($statusSelecionado)) {
-                echo "Nenhuma luta com status <strong>" . htmlspecialchars($statusSelecionado) . "</strong>.";
-            } elseif (!empty($eventoSelecionado)) {
-                echo "Nenhuma luta vinculada ao evento selecionado.";
-            } else {
-                echo "Nenhuma luta cadastrada ainda.";
-            }
-        ?>
+        <?php if (empty($lutas)): ?>
+            <p style="color: red;">Nenhuma luta encontrada com os filtros aplicados.</p>
+        <?php endif; ?>
     </p>
-<?php endif; ?>
-<?php if (empty($lutas)): ?>
-    <p style="color: red;">Nenhuma luta encontrada com os filtros aplicados.</p>
 <?php endif; ?>

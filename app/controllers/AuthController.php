@@ -1,6 +1,4 @@
 <?php
-require_once __DIR__ . '/../models/User.php';
-
 class AuthController {
     public function showLogin() {
         include '../app/views/auth/login.php';
@@ -11,39 +9,73 @@ class AuthController {
     }
 
     public function register() {
+        session_start();
+
+        $nome  = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+        $cpf   = filter_input(INPUT_POST, 'cpf', FILTER_SANITIZE_NUMBER_INT);
+        $senha = filter_input(INPUT_POST, 'senha', FILTER_UNSAFE_RAW);
+        $telefone = filter_input(INPUT_POST, 'telefone', FILTER_SANITIZE_NUMBER_INT);
+        $dataNascimento = filter_input(INPUT_POST, 'data_nascimento', FILTER_UNSAFE_RAW);
+    
+        if (!$nome || !$email || !$cpf || !$senha || !$telefone || !$dataNascimento) {
+            $_SESSION['mensagem'] = "Todos os campos são obrigatórios.";
+            header("Location: /apostas_mvc_completo/public/index.php?action=register");
+            exit;
+        }
+    
         $user = new User();
-        $data = $_POST;
     
-        if ($user->existsByEmail($data['email'])) {
-            echo "Esse email já está sendo utilizado";
-            return;
+        if ($user->existsByEmail($email)) {
+            $_SESSION['mensagem'] = "Esse email já está sendo utilizado.";
+            header("Location: /apostas_mvc_completo/public/index.php?action=register");
+            exit;
         }
     
-        if ($user->existsByCPF($data['cpf'])) {
-            echo "Esse CPF já está sendo utilizado";
-            return;
+        if ($user->existsByCPF($cpf)) {
+            $_SESSION['mensagem'] = "Esse CPF já está sendo utilizado.";
+            header("Location: /apostas_mvc_completo/public/index.php?action=register");
+            exit;
         }
+    
+        $data = [
+            'nome' => $nome,
+            'email' => $email,
+            'cpf' => $cpf,
+            'senha' => $senha,
+            'telefone' => $telefone,
+            'data_nascimento' => $dataNascimento
+        ];
     
         if ($user->create($data)) {
+            $_SESSION['mensagem'] = "Cadastro realizado com sucesso.";
             header("Location: /apostas_mvc_completo/public/index.php?action=login");
             exit;
         } else {
-            echo "Erro ao cadastrar.";
+            $_SESSION['mensagem'] = "Erro ao cadastrar.";
+            header("Location: /apostas_mvc_completo/public/index.php?action=register");
+            exit;
         }
     }
+    
 
     public function login() {
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $senha = filter_input(INPUT_POST, 'senha', FILTER_DEFAULT);
+
+        if (!$email || !$senha) {
+            echo "Email e senha são obrigatórios.";
+            return;
+        }
+
         $user = new User();
-        $email = $_POST['email'];
-        $senha = $_POST['senha'];
-    
         $dados = $user->login($email, $senha);
-    
+
         if ($dados) {
             session_start();
             $_SESSION['email'] = $dados['email'];
             $_SESSION['user'] = $dados;
-    
+
             if ($dados['role'] === 'admin') {
                 header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
             } else {

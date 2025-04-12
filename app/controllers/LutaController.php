@@ -1,6 +1,4 @@
 <?php
-require_once '../app/models/Luta.php';
-
 class LutaController {
     public function salvar() {
         session_start();
