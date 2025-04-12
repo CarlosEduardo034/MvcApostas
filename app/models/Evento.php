@@ -57,6 +57,7 @@ class Evento {
             </script>";
         }
     }
+    
     public function buscarEventoPorId($id) {
         $stmt = $this->conn->prepare("SELECT * FROM eventos WHERE id = ?");
         $stmt->bind_param("i", $id);
@@ -71,6 +72,10 @@ class Evento {
         return $stmt->execute();
     }
     
-    
+    public function marcarComoConcluido($eventoId) {
+        $stmt = $this->conn->prepare("UPDATE eventos SET status = 'concluido' WHERE id = ?");
+        $stmt->bind_param("i", $eventoId);
+        return $stmt->execute();
+    }
 }
 ?>

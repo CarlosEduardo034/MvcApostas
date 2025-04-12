@@ -6,44 +6,45 @@ class EventoController {
             echo "Acesso restrito.";
             exit;
         }
-
+    
+        $token = $_POST['csrf_token'] ?? '';
+        if (!$token || $token !== $_SESSION['csrf_token']) {
+            $_SESSION['mensagem'] = "Token CSRF inválido.";
+            header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
+            exit;
+        }
+    
         $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_STRING);
         $data_evento = filter_input(INPUT_POST, 'data_evento', FILTER_SANITIZE_STRING);
         $local = filter_input(INPUT_POST, 'local', FILTER_SANITIZE_STRING);
-
+    
         if (!$nome || !$data_evento || !$local) {
-            echo "<script>
-                alert('Preencha todos os campos corretamente.');
-                window.location.href = '/apostas_mvc_completo/public/index.php?action=dashboard';
-            </script>";
+            $_SESSION['mensagem'] = "Preencha todos os campos corretamente.";
+            header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
             exit;
         }
-
+    
         $dataEventoFormatada = date('Y-m-d H:i:s', strtotime($data_evento));
         $agora = date('Y-m-d H:i:s');
-
+    
         if ($dataEventoFormatada < $agora) {
-            echo "<script>
-                alert('Erro: O evento não pode ser cadastrado com data/hora anterior à atual.');
-                window.location.href = '/apostas_mvc_completo/public/index.php?action=dashboard';
-            </script>";
+            $_SESSION['mensagem'] = "Erro: A data do evento deve ser futura.";
+            header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
             exit;
         }
-
-        require_once '../app/models/Evento.php';
+    
         $eventoModel = new Evento();
         $eventoModel->criarEvento([
             'nome' => $nome,
             'data_evento' => $dataEventoFormatada,
             'local' => $local
         ]);
-
-        echo "<script>
-            alert('Evento cadastrado com sucesso!');
-            window.location.href = '/apostas_mvc_completo/public/index.php?action=dashboard';
-        </script>";
+    
+        $_SESSION['mensagem'] = "Evento cadastrado com sucesso!";
+        header("Location: /apostas_mvc_completo/public/index.php?action=dashboard");
         exit;
     }
+    
 
     public function excluir() {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);

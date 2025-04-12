@@ -14,6 +14,7 @@
             <div class="containerCadratro">
                 <h2>Cadastre-se</h2>
                 <form action="index.php?action=do_register" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     <div class="user-box">
                         <input type="text" name="nome" id="nome" required="">
                         <label>Nome</label>

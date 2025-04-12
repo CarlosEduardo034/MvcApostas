@@ -9,7 +9,15 @@ class AuthController {
     }
 
     public function register() {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $token = $_POST['csrf_token'] ?? '';
+            if (!$token || $token !== $_SESSION['csrf_token']) {
+                echo "Token CSRF inválido.";
+            exit;
+            }
 
         $nome  = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
@@ -60,6 +68,12 @@ class AuthController {
     
 
     public function login() {
+        $token = $_POST['csrf_token'] ?? '';
+            if (!$token || $token !== $_SESSION['csrf_token']) {
+                echo "Token CSRF inválido.";
+            exit;
+            }
+
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $senha = filter_input(INPUT_POST, 'senha', FILTER_DEFAULT);
 

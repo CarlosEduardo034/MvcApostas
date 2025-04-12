@@ -95,7 +95,9 @@ class Luta {
     
         $stmt->close();
     }
+
     public function atualizarVencedor($id, $vencedor) {
+         echo "Chamando atualizarVencedor com ID: $id e vencedor: $vencedor";
         $stmt = $this->conn->prepare("
             UPDATE lutas 
             SET vencedor = ?, status = 'concluido' 
@@ -104,6 +106,28 @@ class Luta {
         $stmt->bind_param("si", $vencedor, $id);
         return $stmt->execute();
     }
+
+    public function buscarEventoIdPorLuta($lutaId) {
+        $stmt = $this->conn->prepare("SELECT evento_id FROM lutas WHERE id = ?");
+        $stmt->bind_param("i", $lutaId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc()['evento_id'] ?? null;
+    }
+
+    public function todasLutasConcluidas($eventoId) {
+        $stmt = $this->conn->prepare("
+            SELECT COUNT(*) as pendentes 
+            FROM lutas 
+            WHERE evento_id = ? AND status != 'concluido'
+        ");
+        $stmt->bind_param("i", $eventoId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        return $row['pendentes'] == 0;
+    }
+    
     public function atualizarTotaisAposta($luta_id, $valor, $escolha) {
         $campo = $escolha === 'lutador1' ? 'apostas_lutador1' : 'apostas_lutador2';
     

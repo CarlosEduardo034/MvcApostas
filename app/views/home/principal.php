@@ -34,6 +34,7 @@ $lutas = $lutaModel->listarLutas();
             <?= htmlspecialchars($luta['lutador2_nome']) ?> (<?= $luta['lutador2_peso'] ?> kg)<br><br>
 
             <form action="/apostas_mvc_completo/public/index.php?action=apostar" method="post">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <input type="hidden" name="luta_id" value="<?= $luta['id'] ?>">
                 <label>Escolha seu lutador:</label><br>
                 <input type="radio" name="escolha" value="lutador1" required> 

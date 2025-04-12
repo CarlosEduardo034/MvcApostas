@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 if (!isset($_SESSION['user'])) {
     header("Location: /apostas_mvc_completo/public/index.php?action=login");
     exit;
@@ -48,6 +50,7 @@ echo "<h2>Bem-vindo, administrador " . htmlspecialchars($_SESSION['user']['nome'
     <input type="text" name="nome" placeholder="Nome do Evento" required>
     <input type="datetime-local" name="data_evento" required min="<?= date('Y-m-d\TH:i') ?>">
     <input type="text" name="local" placeholder="Local do Evento" required>
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
     <button type="submit">Cadastrar</button>
 </form>
 
@@ -123,6 +126,8 @@ $eventosListados = $eventoModel->listarEventos();
     <input type="text" name="lutador2_nome" required><br>
     <label>Lutador 2 - Peso (kg):</label><br>
     <input type="number" name="lutador2_peso" step="0.1" required><br><br>
+    
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
     <button type="submit">Salvar Luta</button>
 </form>
@@ -217,6 +222,7 @@ document.getElementById('evento_id').addEventListener('change', function () {
                     <td>
                         <?= $luta['vencedor'] ? htmlspecialchars($luta[$luta['vencedor'].'_nome']) : 'Selecionar:' ?>
                         <form action="/apostas_mvc_completo/public/index.php?action=declarar_vencedor" method="post" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                             <input type="hidden" name="id" value="<?= $luta['id'] ?>">
                                 <select name="vencedor" required>
                                     <option value="">--Selecionar--</option>
@@ -229,6 +235,7 @@ document.getElementById('evento_id').addEventListener('change', function () {
                                 </select>
                             <button type="submit">Salvar</button>
                         </form>
+
                     </td>
                     <td>
                         <?= $luta['status'] === 'concluido' ? 'Evento Concluído' : 'Evento Pendente' ?>

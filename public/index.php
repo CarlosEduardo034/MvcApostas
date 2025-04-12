@@ -1,4 +1,10 @@
 <?php
+session_start();
+
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 require_once '../config/autoload.php';
 
 $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING) ?? 'login';
